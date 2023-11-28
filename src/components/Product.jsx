@@ -1,9 +1,27 @@
 // components/Product.js
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import Modal from "react-modal";
+import { getCakes } from '@/rest/api';
+
 
 const Product = () => {
+  const [foods, setFoods] = useState([]);
+  const [allFoods, setAllFoods] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const cakesData = await getCakes();
+        setFoods(cakesData);
+        setAllFoods(cakesData);
+      } catch (error) {
+        console.error('Failed to fetch cakes:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const openModal = () => {
     setModalOpen(true);
@@ -11,6 +29,12 @@ const Product = () => {
 
   const closeModal = () => {
     setModalOpen(false);
+  };
+
+  const formatRupiah = (number) => {
+    const parts = number.toFixed(0).toString().split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return `Rp. ${parts.join('.')}`;
   };
 
   return (
@@ -61,45 +85,31 @@ const Product = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="p-4 border-b border-blue-gray-50">
-              <div className="flex items-center gap-3">
-                <div className="text-blue-gray-900">
-                  <p className="font-semibold">1.</p>
+        {foods.map((food, index) => (
+            <tr key={food.cake_id}>
+              <td className="p-4 border-b border-blue-gray-50">
+                <p className="font-semibold">{index + 1}.</p>
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <div className="flex items-center gap-3">
+                  <img src={food.image} alt={food.name} className="w-10 h-10 object-cover rounded-md" />
+                  <p className="font-semibold">{food.name}</p>
                 </div>
-              </div>
-            </td>
-            <td className="p-4 border-b border-blue-gray-50">
-              <div className="text-blue-gray-900">
-                <p className="font-semibold">
-                  {/* Gambar Product */}
-                </p>
-              </div>
-            </td>
-            <td className="p-4 border-b border-blue-gray-50">
-              <div className="text-blue-gray-900">
-                <p className="font-semibold">Category</p>
-              </div>
-            </td>
-            <td className="p-4 border-b border-blue-gray-50">
-              <div className="text-blue-gray-900">
-                <p className="font-semibold">1</p>
-              </div>
-            </td>
-            <td className="p-4 border-b border-blue-gray-50">
-              <div className="text-blue-gray-900">
-                <p className="font-semibold">Rp.1000.000</p>
-              </div>
-            </td>
-            <td className="p-4 border-b border-blue-gray-50">
-              <div className="flex items-center gap-3">
-                <button className="p-2 bg-red-500 text-white rounded-md">
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-          {/* ... Repeat for other rows ... */}
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <p className="font-semibold">{food.category}</p>
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <p className="font-semibold">1</p> {/* Quantity Placeholder */}
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <p className="font-semibold">{formatRupiah(food.price)}</p>
+              </td>
+              <td className="p-4 border-b border-blue-gray-50">
+                <button className="p-2 bg-red-500 text-white rounded-md">Delete</button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
 
