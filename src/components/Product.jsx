@@ -115,81 +115,117 @@ const Product = () => {
 
       {/* Modal for Add Product form */}
       <Modal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        contentLabel="Add Product Modal"
-        className="modal"
-        overlayClassName="overlay"
-        style={{
-          content: {
-            width: '375px',
-            height: '667px',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            position: 'absolute',
-            border: '2px solid #ccc',
-            borderRadius: '8px',
-            background: '#fff',
-          },
-          overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          },
-        }}
-      >
-        <div className="mx-auto my-auto max-w-screen-sm">
-          <h2 className="text-2xl mb-4">Add Product</h2>
-          <form>
-            {/* Your form fields go here */}
-            <div className="mb-4">
-              <label htmlFor="productName" className="block text-sm font-medium text-gray-700">
-                Product Name
-              </label>
-              <input
-                type="text"
-                id="productName"
-                name="productName"
-                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="productName" className="block text-sm font-medium text-gray-700">
-                Price
-              </label>
-              <input
-                type="text"
-                id="productName"
-                name="productName"
-                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="productName" className="block text-sm font-medium text-gray-700">
-                Image
-              </label>
-              <input
-                type="text"
-                id="productName"
-                name="productName"
-                className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-              />
-            </div>
-            {/* ... Add more form fields as needed ... */}
-            <button
-              type="submit"
-              className="p-2 bg-blue-500 text-white rounded-md"
-            >
-              Submit
-            </button>
-          </form>
-          <button
-            onClick={closeModal}
-            className="mt-4 p-2 bg-red-500 text-white rounded-md"
-          >
-            Close
-          </button>
-        </div>
-      </Modal>
+  isOpen={isModalOpen}
+  onRequestClose={closeModal}
+  contentLabel="Add Product Modal"
+  className="modal"
+  overlayClassName="overlay"
+  style={{
+    content: {
+      width: '90%', // More responsive width
+      maxWidth: '600px', // Maximum width
+      height: 'auto', // Auto height for content flexibility
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      position: 'absolute',
+      border: '1px solid #ddd', // Softer border
+      borderRadius: '12px', // Rounded corners
+      background: '#fff',
+      padding: '20px', // Padding inside the modal
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+    },
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Darker overlay for better focus
+    },
+  }}
+>
+  <div>
+    <h2 className="text-2xl mb-6 font-semibold text-center">Add Product</h2>
+    <form>
+      {/* Form fields with improved layout */}
+      <div className="mb-4">
+    <label htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-2">
+      Product Name
+    </label>
+    <input
+      type="text"
+      id="productName"
+      name="productName"
+      className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+    />
+  </div>
+
+  {/* Description Field */}
+  <div className="mb-4">
+    <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+      Description
+    </label>
+    <textarea
+      id="description"
+      name="description"
+      className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+    ></textarea>
+  </div>
+
+  {/* Price Field */}
+  <div className="mb-4">
+    <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+      Price
+    </label>
+    <input
+      type="number"
+      id="price"
+      name="price"
+      className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+    />
+  </div>
+
+  {/* Image URL Field */}
+  <div className="mb-4">
+    <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+      Image URL
+    </label>
+    <input
+      type="text"
+      id="image"
+      name="image"
+      className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+    />
+  </div>
+
+  {/* Category Field */}
+  <div className="mb-4">
+    <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+      Category
+    </label>
+    <input
+      type="text"
+      id="category"
+      name="category"
+      className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+    />
+  </div>
+
+      {/* Repeat for other fields */}
+      <div className="flex justify-between items-center mt-6">
+        <button
+          type="submit"
+          className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+        >
+          Submit
+        </button>
+        <button
+          onClick={closeModal}
+          className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+        >
+          Close
+        </button>
+      </div>
+    </form>
+  </div>
+</Modal>
+
     </div>
   );
 };
