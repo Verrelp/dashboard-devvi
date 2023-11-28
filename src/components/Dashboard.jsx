@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { FaBox } from 'react-icons/fa';
+import { FaBox, FaRegUser } from 'react-icons/fa';
 import { MdLocalShipping, MdDashboard } from "react-icons/md";
 import { TbReportSearch } from "react-icons/tb";
 import Link from 'next/link';
@@ -75,14 +75,20 @@ const Dashboard = () => {
         <Link href="/products" className="text-gray-600 hover:text-teal-500">
           <FaBox className="inline-block mr-2" /> Product
         </Link>
-              <a href="#" className="text-gray-600 hover:text-teal-500">
-                <MdLocalShipping className="inline-block mr-2" />
-                Order
-              </a>
+             
+        <Link href="/order" className="text-gray-600 hover:text-teal-500">
+          <MdLocalShipping className="inline-block mr-2" /> Order
+        </Link>
               <Link href="/report" className="text-gray-600 hover:text-teal-500">
                 <TbReportSearch className="inline-block mr-2" />
                 Reports
               </Link>
+
+              <Link href="/user" className="text-gray-600 hover:text-teal-500">
+                <FaRegUser className="inline-block mr-2" />
+                User
+              </Link>
+
             </div>
           </div>
         </div>

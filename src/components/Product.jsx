@@ -15,7 +15,7 @@ const Product = () => {
 
   return (
     <div className="p-6 overflow-scroll px-0">
-      <h1 className="text-2xl font-semibold mb-4">Add Product Page</h1>
+      <h1 className="text-2xl font-semibold mb-4"> Product Page Management</h1>
       <div className="flex justify-between items-center mb-4">
         <div></div> {/* Empty div for spacing */}
         <button

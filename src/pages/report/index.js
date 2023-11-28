@@ -1,7 +1,14 @@
-import Report from "@/components/Reports";
+import TransactionChart from '@/components/Chart';
+import Navbar2 from '@/components/Navbar';
+
 
 const ReportPages = () => {
-  return <Report/>;
+  return (
+    <div>
+      <Navbar2 />
+      <TransactionChart />
+    </div>
+  );
 };
 
 export default ReportPages;
