@@ -1,19 +1,20 @@
 // components/Product.js
 import React, { useState , useEffect} from "react";
 import Modal from "react-modal";
-import { getCakes, postCakes } from '@/rest/api';
-
+import { getCakes, postCakes, deleteCake } from '@/rest/api';
+import { toast } from 'react-toastify';
 
 const Product = () => {
   const [foods, setFoods] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
-  
+  const [refreshCakes, setRefreshCakes] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [imageUploadUrl, setImageUploadUrl] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageUploadNotification, setImageUploadNotification] = useState('');
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedCakeId, setSelectedCakeId] = useState(null);
+  const [selectedCakeName, setSelectedCakeName] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,7 +26,7 @@ const Product = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [refreshCakes]);
 
   const openModal = () => {
     setModalOpen(true);
@@ -91,6 +92,7 @@ const handleSubmit = async (event) => {
     name: event.target.productName.value,
     description: event.target.description.value,
     price: event.target.price.value,
+    category: event.target.category.value,
     image: imageUploadUrl, // Use the uploaded image URL
   };
 
@@ -98,14 +100,37 @@ const handleSubmit = async (event) => {
     const result = await postCakes(formData);
     console.log(result);
     setImagePreview(null);
+    toast.success("Kue Berhasil ditambahkan!", {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 4000
+    });
     closeModal(); // Close the modal after successful submission
     setImageUploadNotification('Please upload an image before submitting.');
+    setRefreshCakes(prevState => !prevState)
+    
     // You may also want to refresh the foods list here
   } catch (error) {
     console.error('Error submitting form:', error);
   }
 };
 
+const handleDelete = async () => {
+  if (selectedCakeId) {
+    await deleteCake({ cake_id: selectedCakeId });
+    toast.success("Kue Berhasil dihapus!", {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 4000
+    });
+    setRefreshCakes(prevState => !prevState); // Trigger re-fetch
+    setShowDeleteModal(false); // Close the modal
+  }
+};
+
+const openDeleteModal = (cakeId, cakeName) => {
+  setSelectedCakeId(cakeId);
+  setSelectedCakeName(cakeName);
+  setShowDeleteModal(true);
+};
 
 
   return (
@@ -177,7 +202,10 @@ const handleSubmit = async (event) => {
                 <p className="font-semibold">{formatRupiah(food.price)}</p>
               </td>
               <td className="p-4 border-b border-blue-gray-50">
-                <button className="p-2 bg-red-500 text-white rounded-md">Delete</button>
+              <button
+          className="p-2 bg-red-500 text-white rounded-md"
+          onClick={() => openDeleteModal(food.cake_id, food.name)}
+        >Delete</button>
               </td>
             </tr>
           ))}
@@ -324,6 +352,80 @@ const handleSubmit = async (event) => {
     </form>
   </div>
 </Modal>
+
+<Modal
+  className="modal"
+  overlayClassName="overlay"
+  style={{
+    content: {
+      width: '90%', // More responsive width
+      maxWidth: '600px', // Maximum width
+      height: 'auto', // Auto height for content flexibility
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      position: 'absolute',
+      border: '1px solid #ddd', // Softer border
+      borderRadius: '12px', // Rounded corners
+      background: '#fff',
+      padding: '20px', // Padding inside the modal
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+    },
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Darker overlay for better focus
+    },
+  }}
+>
+  <div>
+    <h2 className="text-2xl mb-6 font-semibold text-center">Delete Product</h2>
+    
+  </div>
+</Modal>
+
+<Modal
+        isOpen={showDeleteModal}
+        onRequestClose={() => setShowDeleteModal(false)}
+  style={{
+    content: {
+      width: '90%', // More responsive width
+      maxWidth: '600px', // Maximum width
+      height: 'auto', // Auto height for content flexibility
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      position: 'absolute',
+      border: '1px solid #ddd', // Softer border
+      borderRadius: '12px', // Rounded corners
+      background: '#fff',
+      padding: '20px', // Padding inside the modal
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+    },
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Darker overlay for better focus
+    },
+  }}
+      >
+        <div>
+        <h2 className="text-2xl mb-6 font-semibold text-center">Delete Product</h2>
+        <p>Apakah anda ingin menghapus kue {selectedCakeName} ?</p>
+      </div>
+        <div className="flex justify-between items-center mt-6">
+        <button
+          type="submit"
+          onClick={handleDelete}
+          className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+        >
+          Delete Kue
+        </button>
+        <button
+          onClick={() => setShowDeleteModal(false)}
+          className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+        >
+          Close
+        </button>
+      </div>
+       
+      </Modal>
 
     </div>
   );
