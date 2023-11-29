@@ -1,6 +1,72 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getOrders } from '@/rest/api'; 
 
 const Order = () => {
+
+    const [orders, setOrders] = useState([]);
+    const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
+    const [filterOrderStatus, setFilterOrderStatus] = useState('');
+
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                const data = await getOrders();
+                setOrders(data);
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        };
+
+        fetchOrders();
+    }, []);
+
+    const filteredOrders = orders
+        .filter(order => {
+            return filterPaymentStatus === '' || (order.Payments && order.Payments[0].status === filterPaymentStatus);
+        })
+        .filter(order => {
+            return filterOrderStatus === '' || order.status === filterOrderStatus;
+        });
+
+        // Function to format the date
+        const formatDate = (dateString) => {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+    
+        // Function to calculate due date
+        const calculateDueDate = (orderDate) => {
+            const dueDate = new Date(orderDate);
+            const currentDate = new Date();
+            const timeDiff = dueDate.getTime() - currentDate.getTime();
+            
+            // Calculate the difference in days
+            const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+            return daysDiff > 0 ? `${daysDiff} days remaining` : 'Due date passed';
+        }
+
+        
+        const getPaymentStatus = (status) => {
+            const statusMapping = {
+                'Pending': 'Belum Bayar',
+                'Completed': 'Sudah Bayar',
+                'Failed': 'Gagal Bayar'
+            };
+            return statusMapping[status] || status;
+        }
+
+        const translateStatus = (status) => {
+            const statusTranslations = {
+                'Pending': 'Menunggu',
+                'InProcess': 'Sedang Diproses',
+                'Shipped': 'Dikirim',
+                'Delivered': 'Terkirim'
+            };
+            return statusTranslations[status] || status;
+        };
+
+
     return (
 
 <div className="bg-white p-8 rounded-md w-full">
@@ -22,9 +88,33 @@ const Order = () => {
             </div>
         </div>
     </div>
+    <div>
+                    <select
+                        className="mr-2 p-2"
+                        value={filterPaymentStatus}
+                        onChange={(e) => setFilterPaymentStatus(e.target.value)}
+                    >
+                        <option value="">All Payment Statuses</option>
+                        <option value="Pending">Belum Bayar</option>
+                        <option value="Completed">Sudah Bayar</option>
+                        <option value="Failed">Gagal Bayar</option>
+                    </select>
+                    <select
+                        className="p-2"
+                        value={filterOrderStatus}
+                        onChange={(e) => setFilterOrderStatus(e.target.value)}
+                    >
+                        <option value="">All Order Statuses</option>
+                        <option value="Pending">Menunggu</option>
+                        <option value="InProcess">Sedang Diproses</option>
+                        <option value="Shipped">Dikirim</option>
+                        <option value="Delivered">Terkirim</option>
+                    </select>
+                </div>
     <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
         <div className="inline-block min-w-full shadow rounded-lg overflow-hidden">
             <table className="min-w-full leading-normal">
+                
                 <thead>
                     <tr>
                         <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -43,7 +133,7 @@ const Order = () => {
                          Delivery Address
                         </th>
                         <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            QTY
+                            Payment
                         </th>
                         <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                             Status
@@ -54,63 +144,63 @@ const Order = () => {
                     </tr>
                 </thead>
                 <tbody>
-                <tr>
-								<td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-									<div className="flex items-center">
-										<div className="flex-shrink-0 w-10 h-10">
-											<img className="w-full h-full rounded-full"
-                                                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&w=160&h=160&q=80"
-                                                alt="" />
-                                        </div>
-											<div className="ml-3">
-												<p className="text-gray-900 whitespace-no-wrap">
-													Siti Rupiah
-												</p>
-											</div>
-										</div>
-								</td>
-								<td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-									<p className="text-gray-900 whitespace-no-wrap">Mille Crepes</p>
-								</td>
-								<td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-									<p className="text-gray-900 whitespace-no-wrap">
-										Jan 21, 2020
-									</p>
-								</td>
-                                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-									<span
-                                        className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                        <span aria-hidden
-                                            className="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
-									<span className="relative">Jan 24,2020</span>
-									</span>
-								</td>
-								<td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-									<p className="text-gray-900 whitespace-no-wrap">
-										43
-									</p>
-								</td>
-                                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-									<span
-                                        className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                        <span aria-hidden
-                                            className="absolute inset-0 opacity-50 rounded-full"></span>
-									<span className="relative">20</span>
-									</span>
-								</td>
-								<td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-									<span
-                                        className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                        <span aria-hidden
-                                            className="absolute inset-0 bg-red-600 opacity-50 rounded-full"></span>
-									<span className="relative"></span>
-									</span>
-								</td>
-                                <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <button type="button" className="mr-3 text-sm bg-blue-500 hover:bg-blue-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Accept</button>
-                                    <button type="button" className="text-sm bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded focus:outline-none focus:shadow-outline">Reject</button>
-                                </td>
-							</tr>
+                {filteredOrders.map((order) => (
+                        <tr key={order.order_id}>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 w-10 h-10">
+                                        <img className="w-full h-full rounded-full"
+                                             src={order.User.profile_image}
+                                             alt={order.User.full_name} />
+                                    </div>
+                                    <div className="ml-3">
+                                        <p className="text-gray-900 whitespace-no-wrap">
+                                            {order.User.full_name}
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                {order.OrderDetails.map(detail => (
+                                    <div key={detail.order_detail_id}>{detail.Cake.name}</div>
+                                ))}
+                            </td>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p className="text-gray-900 whitespace-no-wrap">
+                                    {formatDate(order.order_date)}
+                                </p>
+                            </td>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                <p className="text-gray-900 whitespace-no-wrap">
+                                    {calculateDueDate(order.order_date)}
+                                </p>
+                            </td>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                {/* Delivery Address */}
+                                <p className="text-gray-900 whitespace-no-wrap">
+                                    {order.Address ? `${order.Address.recipient_name}, ${order.Address.phone_number} ` : 'No address'}
+                                </p>
+                                <p className="text-gray-900 whitespace-no-wrap">
+                                    {order.Address ? `${order.Address.address} ` : ''}
+                                </p>
+                            </td>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                {/* Payment Status */}
+                                <p className="text-gray-900 whitespace-no-wrap">
+                                    {order.Payments && order.Payments.length > 0 
+                                        ? getPaymentStatus(order.Payments[0].status)
+                                        : 'No payment info'}
+                                </p>
+                            </td>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                {/* Order Status */}
+                                <p className="text-gray-900 whitespace-no-wrap">
+                                    {translateStatus(order.status)}
+                                </p>
+                            </td>
+                            {/* ... other columns ... */}
+                        </tr>
+                    ))}
 						
 						
                             

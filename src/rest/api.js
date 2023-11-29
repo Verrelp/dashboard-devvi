@@ -47,3 +47,13 @@ export const postCakes = async ({
         }
     }
   }
+
+
+  export const getOrders = async () => {
+    try {
+        const response = await api.get('/api/orders');
+        return response.data.data;
+    } catch (error) {
+        throw error;
+    }
+}
