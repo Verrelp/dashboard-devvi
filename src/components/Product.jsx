@@ -1,21 +1,25 @@
 // components/Product.js
 import React, { useState , useEffect} from "react";
 import Modal from "react-modal";
-import { getCakes } from '@/rest/api';
+import { getCakes, postCakes } from '@/rest/api';
 
 
 const Product = () => {
   const [foods, setFoods] = useState([]);
-  const [allFoods, setAllFoods] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  
+  const [profileImage, setProfileImage] = useState(null);
+  const [imageUploadUrl, setImageUploadUrl] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageUploadNotification, setImageUploadNotification] = useState('');
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const cakesData = await getCakes();
         setFoods(cakesData);
-        setAllFoods(cakesData);
       } catch (error) {
         console.error('Failed to fetch cakes:', error);
       }
@@ -25,6 +29,7 @@ const Product = () => {
 
   const openModal = () => {
     setModalOpen(true);
+    setImageUploadNotification('Please upload an image before submitting.');
   };
 
   const closeModal = () => {
@@ -36,6 +41,72 @@ const Product = () => {
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     return `Rp. ${parts.join('.')}`;
   };
+
+  const handleImagesChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleImageUpload(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+
+const handleImageUpload = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    // Replace 'your-api-endpoint' with the actual API endpoint
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const response = await fetch(`${apiBaseUrl}/api/images/upload/profile`, {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await response.json();
+
+    // Assuming the API returns the URL of the uploaded image
+    if (result.imageUrl) {
+      setImageUploadUrl(result.imageUrl);
+      setImageUploadNotification('');
+    }
+  } catch (error) {
+    console.error('Error uploading image:', error);
+  }
+};
+
+const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  if (!imageUploadUrl) {
+    setImageUploadNotification('Please upload an image before submitting.');
+    return; // Stop the submission if image is not uploaded
+  }
+
+  // Collecting form data
+  const formData = {
+    name: event.target.productName.value,
+    description: event.target.description.value,
+    price: event.target.price.value,
+    image: imageUploadUrl, // Use the uploaded image URL
+  };
+
+  try {
+    const result = await postCakes(formData);
+    console.log(result);
+    setImagePreview(null);
+    closeModal(); // Close the modal after successful submission
+    setImageUploadNotification('Please upload an image before submitting.');
+    // You may also want to refresh the foods list here
+  } catch (error) {
+    console.error('Error submitting form:', error);
+  }
+};
+
+
 
   return (
     <div className="p-6 overflow-scroll px-0">
@@ -142,7 +213,36 @@ const Product = () => {
 >
   <div>
     <h2 className="text-2xl mb-6 font-semibold text-center">Add Product</h2>
-    <form>
+    <form onSubmit={handleSubmit}>
+      {/* Notification for image upload */}
+      
+      {/* Image URL Field */}
+  <div className="mb-4">
+    <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+      Image Upload
+    </label>
+    <label className="flex flex-col justify-center items-center w-full h-full bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer hover:bg-gray-100">
+            <div id="preview-container" className="flex flex-col justify-center items-center w-full h-full">
+                {imagePreview ? (
+                    <img src={imagePreview} alt="Preview" />
+                ) : (
+                    <>
+                        <svg className="mb-3 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h10m-7 4h7"></path>
+                        </svg>
+                        <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x800px)</p>
+                    </>
+                )}
+            </div>
+            <input type="file" name="profile_image" className="hidden" onChange={handleImagesChange} />
+        </label>
+  </div>
+  {imageUploadNotification && (
+              <div className="text-red-500 mb-2">
+                {imageUploadNotification}
+              </div>
+            )} 
       {/* Form fields with improved layout */}
       <div className="mb-4">
     <label htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -181,36 +281,35 @@ const Product = () => {
     />
   </div>
 
-  {/* Image URL Field */}
-  <div className="mb-4">
-    <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
-      Image URL
-    </label>
-    <input
-      type="text"
-      id="image"
-      name="image"
-      className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-    />
-  </div>
-
-  {/* Category Field */}
   <div className="mb-4">
     <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-      Category
+        Category
     </label>
-    <input
-      type="text"
-      id="category"
-      name="category"
-      className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-    />
-  </div>
+    <select
+        id="category"
+        name="category"
+        className="mt-1 p-2 border border-gray-300 rounded-md w-full focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+    >
+        <option value="cakes">Cakes</option>
+        <option value="pastry">Pastry</option>
+        <option value="bakery">Bakery</option>
+    </select>
+</div>
+
+
+  
+
+  {/* Category Field */}
+ 
+
+
+
 
       {/* Repeat for other fields */}
       <div className="flex justify-between items-center mt-6">
         <button
           type="submit"
+          disabled={!imageUploadUrl}
           className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
         >
           Submit

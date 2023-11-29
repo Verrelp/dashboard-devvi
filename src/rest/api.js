@@ -16,3 +16,22 @@ export const getCakes = async () => {
     }
 }
 
+export const postCakes = async ({
+    name, description, price, image
+  }) => {
+    try {
+        const response = await api.post('/api/cakes', {
+          user_id: 3,
+          name,
+          description,
+          price,
+          image: image
+        });
+        return response.data;
+    } catch (error) {
+        if (error) {
+            alert(error.response.data.message);            
+        }
+    }
+  }
+
