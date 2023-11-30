@@ -204,6 +204,36 @@ const Order = () => {
                                     {translateStatus(order.status)}
                                 </p>
                             </td>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                {/* Action Button */}
+                                {order.Payments && order.Payments.length > 0 && order.Payments[0].status === 'Completed' && order.status === 'Pending' ?
+                                    <button
+                                        className="text-white bg-blue-500 hover:bg-blue-700 font-medium py-1 px-3 border border-blue-500 hover:border-transparent rounded"
+                                        onClick={() => {/* handle your process order logic here */}}
+                                    >
+                                        Process Order
+                                    </button>
+                                    : null
+                                }
+                                {order.Payments && order.Payments.length > 0 && order.Payments[0].status === 'Completed' && order.status === 'InProcess' ?
+                                    <button
+                                        className="text-white bg-blue-500 hover:bg-blue-700 font-medium py-1 px-3 border border-blue-500 hover:border-transparent rounded"
+                                        onClick={() => {/* handle your process order logic here */}}
+                                    >
+                                        Kirim Order
+                                    </button>
+                                    : null
+                                }
+                                {order.Payments && order.Payments.length > 0 && order.Payments[0].status === 'Completed' && order.status === 'Shipped' ?
+                                    <button
+                                        className="text-white bg-blue-500 hover:bg-blue-700 font-medium py-1 px-3 border border-blue-500 hover:border-transparent rounded"
+                                        onClick={() => {/* handle your process order logic here */}}
+                                    >
+                                        Selesai Order
+                                    </button>
+                                    : null
+                                }
+                            </td>
                             {/* ... other columns ... */}
                         </tr>
                     ))}
