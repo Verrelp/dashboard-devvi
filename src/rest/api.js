@@ -57,3 +57,23 @@ export const postCakes = async ({
         throw error;
     }
 }
+
+export const getUsers = async () => {
+    try {
+        const response = await api.get('/api/users');
+        return response.data.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const deleteUser = async ({ user_id }) => {
+    try {
+        const response = await api.delete('/api/users/' + user_id);
+        return response.data;
+    } catch (error) {
+        if (error) {
+            alert(error.response.data.message);            
+        }
+    }
+  }
