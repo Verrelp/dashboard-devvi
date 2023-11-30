@@ -162,7 +162,13 @@ const Order = () => {
                             </td>
                             <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                                 {order.OrderDetails.map(detail => (
-                                    <div key={detail.order_detail_id}>{detail.Cake.name}</div>
+                                    <div key={detail.order_detail_id}>
+                                        {
+                                        detail && detail.Cake 
+                                          ? <div key={detail.order_detail_id}>{detail.Cake.name}</div> 
+                                          : null
+                                         }
+                                    </div>
                                 ))}
                             </td>
                             <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
