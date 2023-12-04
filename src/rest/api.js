@@ -58,6 +58,15 @@ export const postCakes = async ({
     }
 }
 
+export const getCountOrders = async () => {
+    try {
+        const response = await api.get('/api/orders/count');
+        return response.data.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const getUsers = async () => {
     try {
         const response = await api.get('/api/users');
@@ -66,6 +75,16 @@ export const getUsers = async () => {
         throw error;
     }
 }
+
+export const getCountUsers = async () => {
+    try {
+        const response = await api.get('/api/users/count');
+        return response.data.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 export const deleteUser = async ({ user_id }) => {
     try {
