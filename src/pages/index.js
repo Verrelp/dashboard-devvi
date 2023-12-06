@@ -1,10 +1,11 @@
-import Dashboard from "@/components/Dashboard";
+import AdminLogin from "@/components/AdminLogin";
+
 import React from "react";
 
 const Home = () => {
   return (
     <div>
-      <Dashboard/>
+      <AdminLogin/>
     </div>
   );
 };
