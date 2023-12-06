@@ -1,7 +1,55 @@
 
-import React from 'react';
+import  React, { useEffect, useState } from "react";
+import { postLogin } from '@/rest/api';
+import { useRouter } from 'next/router';
+import { getCookie, setCookie } from "@/utils/cookies";
+import Link from "next/link";
+import { toast } from 'react-toastify';
+
 
 const AdminLogin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+
+  const serviceLgn = async (e) => {
+    e.preventDefault();
+    const isSuccess = await postLogin(
+        {
+            email,
+            password
+        }
+    )
+
+    if (isSuccess && isSuccess.status === 'success') {
+        setCookie("adminData", JSON.stringify(isSuccess.data), {
+            expires: 1
+        })
+        //alert("LOGIN BERHASIL !!!");
+        toast.success("LOGIN BERHASIL !!!", {
+            position: toast.POSITION.TOP_CENTER,
+            autoClose: 5000
+        });
+        setTimeout(() => {
+            router.push('/dashboard');
+        }, 1000);
+    }
+
+  }
+
+
+  useEffect(() => {
+    const userData = getCookie("adminData");
+    //console.log(userData);
+    // if (userData) {
+    //   const parsedUserData = JSON.parse(userData);
+    //   if (parsedUserData && parsedUserData.accessToken) {
+    //     router.push("/home");
+    //   }
+    // }
+  }, []);
+
+
   return (
     <div className="font-mono bg-gray-400">
       {/* Container */}
@@ -17,16 +65,20 @@ const AdminLogin = () => {
             {/* Col */}
             <div className="w-full lg:w-1/2 bg-white p-5 rounded-lg lg:rounded-l-none">
               <h3 className="pt-4 text-2xl text-center">Welcome Back!</h3>
-              <form className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
+              <form onSubmit={serviceLgn}  className="px-8 pt-6 pb-8 mb-4 bg-white rounded">
                 <div className="mb-4">
-                  <label className="block mb-2 text-sm font-bold text-gray-700" htmlFor="username">
-                    Username
+                  <label className="block mb-2 text-sm font-bold text-gray-700" htmlFor="email">
+                    Email
                   </label>
                   <input
                     className="w-full px-3 py-2 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                    id="username"
+                    id="Email"
                     type="text"
-                    placeholder="Username"
+                    placeholder="Email"
+                    value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
                   />
                 </div>
                 <div className="mb-4">
@@ -38,6 +90,10 @@ const AdminLogin = () => {
                     id="password"
                     type="password"
                     placeholder="******************"
+                    value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
                   />
                   <p className="text-xs italic text-red-500">Please input a password.</p>
                 </div>
